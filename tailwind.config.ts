@@ -26,7 +26,8 @@ export default {
 				foreground: 'hsl(var(--foreground))',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
+					foreground: 'hsl(var(--primary-foreground))',
+					hover: 'hsl(var(--primary-hover))'
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
@@ -51,6 +52,23 @@ export default {
 				card: {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
+				},
+				// South African themed colors
+				sa: {
+					green: 'hsl(var(--sa-green))',
+					gold: 'hsl(var(--sa-gold))',
+					blue: 'hsl(var(--sa-blue))',
+					red: 'hsl(var(--sa-red))'
+				},
+				// Data visualization colors
+				data: {
+					primary: 'hsl(var(--data-primary))',
+					secondary: 'hsl(var(--data-secondary))',
+					tertiary: 'hsl(var(--data-tertiary))',
+					quaternary: 'hsl(var(--data-quaternary))',
+					success: 'hsl(var(--data-success))',
+					warning: 'hsl(var(--data-warning))',
+					error: 'hsl(var(--data-error))'
 				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
