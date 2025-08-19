@@ -97,6 +97,11 @@ const SectorCards = () => {
                 <Button 
                   variant="outline" 
                   className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
+                  onClick={() => {
+                    if (sector.title === "Labour") {
+                      window.location.href = "/labour";
+                    }
+                  }}
                 >
                   View Analytics
                   <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />

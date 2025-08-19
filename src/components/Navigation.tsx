@@ -14,7 +14,7 @@ const Navigation = () => {
 
           {/* Navigation Links */}
           <div className="hidden md:flex items-center space-x-8">
-            <a href="#" className="text-foreground hover:text-primary transition-colors">
+            <a href="/" className="text-foreground hover:text-primary transition-colors">
               Dashboard
             </a>
             <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
@@ -23,7 +23,7 @@ const Navigation = () => {
             <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
               Health
             </a>
-            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+            <a href="/labour" className="text-muted-foreground hover:text-primary transition-colors">
               Labour
             </a>
             <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
