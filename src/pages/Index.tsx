@@ -6,24 +6,23 @@ import DataVisualization from "@/components/DataVisualization";
 import AskDataBar from "@/components/AskDataBar";
 import WardMap from "@/components/WardMap";
 import ProvenanceFooter from "@/components/ProvenanceFooter";
-import QueryResult from "@/components/QueryResult";
+import SimpleQueryResult from "@/components/SimpleQueryResult";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, Users, MapPin, Database } from "lucide-react";
-import { useQueryProcessor } from "@/hooks/useQueryProcessor";
+import { useSimpleQueryProcessor } from "@/hooks/useSimpleQueryProcessor";
 
 const Index = () => {
   const { toast } = useToast();
   const { 
     processQuery, 
     clearQuery, 
-    getSuggestedQueries,
     isProcessing, 
     result, 
     error, 
     originalQuery,
     hasResult 
-  } = useQueryProcessor();
+  } = useSimpleQueryProcessor();
 
   // Sample provenance data for the platform
   const platformProvenance = {
@@ -113,10 +112,10 @@ const Index = () => {
                 AI-powered analysis based on your natural language query
               </p>
             </div>
-            <QueryResult 
-              parsedQuery={result} 
-              originalQuery={originalQuery}
-              onNewQuery={clearQuery}
+            <SimpleQueryResult 
+              query={originalQuery}
+              result={result}
+              error={error}
             />
           </section>
         )}
@@ -135,16 +134,19 @@ const Index = () => {
                 <div className="space-y-4">
                   <div className="text-sm text-destructive whitespace-pre-line">{error}</div>
                   <div className="space-y-2">
-                    <h4 className="font-semibold">Suggested queries:</h4>
-                    {getSuggestedQueries().map((suggestion, index) => (
-                      <button
-                        key={index}
-                        onClick={() => processQuery(suggestion)}
-                        className="block w-full text-left p-3 text-sm bg-muted/30 hover:bg-muted/50 rounded-lg transition-colors"
-                      >
-                        "{suggestion}"
-                      </button>
-                    ))}
+                    <h4 className="font-semibold">Try these examples:</h4>
+                    <button
+                      onClick={() => processQuery("Generate KPI card for youth unemployment")}
+                      className="block w-full text-left p-3 text-sm bg-muted/30 hover:bg-muted/50 rounded-lg transition-colors"
+                    >
+                      "Generate KPI card for youth unemployment"
+                    </button>
+                    <button
+                      onClick={() => processQuery("Show youth unemployment in SA vs Korea")}
+                      className="block w-full text-left p-3 text-sm bg-muted/30 hover:bg-muted/50 rounded-lg transition-colors"
+                    >
+                      "Show youth unemployment in SA vs Korea"
+                    </button>
                   </div>
                 </div>
               </Card>
