@@ -44,8 +44,14 @@ export interface GapLensData {
   scenarios: Array<{
     year: number;
     baseline: number;
+    baseline_upper?: number;
+    baseline_lower?: number;
     moderate: number;
+    moderate_upper?: number;
+    moderate_lower?: number;
     aggressive: number;
+    aggressive_upper?: number;
+    aggressive_lower?: number;
   }>;
   interventions: {
     moderate: string[];
@@ -189,13 +195,48 @@ export const gapLensData: Record<string, GapLensData> = {
   'youth unemployment': {
     indicator: 'Youth Unemployment',
     scenarios: [
-      { year: 2024, baseline: 61, moderate: 61, aggressive: 61 },
-      { year: 2025, baseline: 62, moderate: 58, aggressive: 55 },
-      { year: 2026, baseline: 62, moderate: 55, aggressive: 48 },
-      { year: 2027, baseline: 63, moderate: 52, aggressive: 42 },
-      { year: 2028, baseline: 63, moderate: 50, aggressive: 38 },
-      { year: 2029, baseline: 64, moderate: 47, aggressive: 32 },
-      { year: 2030, baseline: 64, moderate: 45, aggressive: 28 }
+      { 
+        year: 2024, 
+        baseline: 61, baseline_upper: 63, baseline_lower: 59,
+        moderate: 61, moderate_upper: 63, moderate_lower: 59,
+        aggressive: 61, aggressive_upper: 63, aggressive_lower: 59
+      },
+      { 
+        year: 2025, 
+        baseline: 62, baseline_upper: 65, baseline_lower: 59,
+        moderate: 58, moderate_upper: 62, moderate_lower: 54,
+        aggressive: 55, aggressive_upper: 60, aggressive_lower: 50
+      },
+      { 
+        year: 2026, 
+        baseline: 62, baseline_upper: 66, baseline_lower: 58,
+        moderate: 55, moderate_upper: 60, moderate_lower: 50,
+        aggressive: 48, aggressive_upper: 55, aggressive_lower: 41
+      },
+      { 
+        year: 2027, 
+        baseline: 63, baseline_upper: 68, baseline_lower: 58,
+        moderate: 52, moderate_upper: 58, moderate_lower: 46,
+        aggressive: 42, aggressive_upper: 50, aggressive_lower: 34
+      },
+      { 
+        year: 2028, 
+        baseline: 63, baseline_upper: 69, baseline_lower: 57,
+        moderate: 50, moderate_upper: 57, moderate_lower: 43,
+        aggressive: 38, aggressive_upper: 46, aggressive_lower: 30
+      },
+      { 
+        year: 2029, 
+        baseline: 64, baseline_upper: 71, baseline_lower: 57,
+        moderate: 47, moderate_upper: 55, moderate_lower: 39,
+        aggressive: 32, aggressive_upper: 41, aggressive_lower: 23
+      },
+      { 
+        year: 2030, 
+        baseline: 64, baseline_upper: 72, baseline_lower: 56,
+        moderate: 45, moderate_upper: 53, moderate_lower: 37,
+        aggressive: 28, aggressive_upper: 37, aggressive_lower: 19
+      }
     ],
     interventions: {
       moderate: [
@@ -218,13 +259,48 @@ export const gapLensData: Record<string, GapLensData> = {
   'overall unemployment': {
     indicator: 'Overall Unemployment',
     scenarios: [
-      { year: 2024, baseline: 33, moderate: 33, aggressive: 33 },
-      { year: 2025, baseline: 34, moderate: 31, aggressive: 29 },
-      { year: 2026, baseline: 34, moderate: 29, aggressive: 26 },
-      { year: 2027, baseline: 35, moderate: 27, aggressive: 23 },
-      { year: 2028, baseline: 35, moderate: 25, aggressive: 20 },
-      { year: 2029, baseline: 36, moderate: 23, aggressive: 17 },
-      { year: 2030, baseline: 36, moderate: 22, aggressive: 15 }
+      { 
+        year: 2024, 
+        baseline: 33, baseline_upper: 35, baseline_lower: 31,
+        moderate: 33, moderate_upper: 35, moderate_lower: 31,
+        aggressive: 33, aggressive_upper: 35, aggressive_lower: 31
+      },
+      { 
+        year: 2025, 
+        baseline: 34, baseline_upper: 37, baseline_lower: 31,
+        moderate: 31, moderate_upper: 34, moderate_lower: 28,
+        aggressive: 29, aggressive_upper: 33, aggressive_lower: 25
+      },
+      { 
+        year: 2026, 
+        baseline: 34, baseline_upper: 38, baseline_lower: 30,
+        moderate: 29, moderate_upper: 33, moderate_lower: 25,
+        aggressive: 26, aggressive_upper: 31, aggressive_lower: 21
+      },
+      { 
+        year: 2027, 
+        baseline: 35, baseline_upper: 40, baseline_lower: 30,
+        moderate: 27, moderate_upper: 32, moderate_lower: 22,
+        aggressive: 23, aggressive_upper: 29, aggressive_lower: 17
+      },
+      { 
+        year: 2028, 
+        baseline: 35, baseline_upper: 41, baseline_lower: 29,
+        moderate: 25, moderate_upper: 31, moderate_lower: 19,
+        aggressive: 20, aggressive_upper: 27, aggressive_lower: 13
+      },
+      { 
+        year: 2029, 
+        baseline: 36, baseline_upper: 43, baseline_lower: 29,
+        moderate: 23, moderate_upper: 30, moderate_lower: 16,
+        aggressive: 17, aggressive_upper: 25, aggressive_lower: 9
+      },
+      { 
+        year: 2030, 
+        baseline: 36, baseline_upper: 44, baseline_lower: 28,
+        moderate: 22, moderate_upper: 29, moderate_lower: 15,
+        aggressive: 15, aggressive_upper: 23, aggressive_lower: 7
+      }
     ],
     interventions: {
       moderate: [
