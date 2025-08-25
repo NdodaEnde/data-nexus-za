@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import ProvenanceFooter from "@/components/ProvenanceFooter";
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -104,6 +105,18 @@ const pathways = [
 
 const Labour = () => {
   const [selectedScenario, setSelectedScenario] = useState("moderate");
+
+  // Sample provenance data for labour statistics
+  const labourProvenance = {
+    source_organization: "Statistics South Africa & ILO",
+    dataset_name: "Quarterly Labour Force Survey Q3 2023",
+    last_updated: "2023-11-30",
+    collection_date: "2023-09-30",
+    publication_date: "2023-11-30",
+    methodology_url: "https://statssa.gov.za/publications/P0211/Methodology_QLFS.pdf",
+    license: "Open Government License",
+    citation: "Statistics South Africa. (2023). Quarterly Labour Force Survey. Pretoria: Stats SA."
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -474,6 +487,12 @@ const Labour = () => {
           </Card>
         </section>
       </div>
+      
+      <ProvenanceFooter 
+        provenance={labourProvenance}
+        lastUpdated="2023-11-30"
+        dataQuality="high"
+      />
     </div>
   );
 };

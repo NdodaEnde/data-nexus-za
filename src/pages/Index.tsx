@@ -5,12 +5,25 @@ import SectorCards from "@/components/SectorCards";
 import DataVisualization from "@/components/DataVisualization";
 import AskDataBar from "@/components/AskDataBar";
 import WardMap from "@/components/WardMap";
+import ProvenanceFooter from "@/components/ProvenanceFooter";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, Users, MapPin, Database } from "lucide-react";
 
 const Index = () => {
   const { toast } = useToast();
+
+  // Sample provenance data for the platform
+  const platformProvenance = {
+    source_organization: "Statistics South Africa & Municipal IDP",
+    dataset_name: "Ward-level Socioeconomic Indicators 2023",
+    last_updated: "2024-01-15",
+    collection_date: "2023-12-01",
+    publication_date: "2024-01-15",
+    methodology_url: "https://statssa.gov.za/methodology/ward-data",
+    license: "CC BY 4.0",
+    citation: "Statistics South Africa. (2024). Ward-level Socioeconomic Indicators. Pretoria: Stats SA."
+  };
 
   const handleQuery = async (query: string) => {
     // Mock query processing - will be replaced with real LLM integration
@@ -105,6 +118,12 @@ const Index = () => {
         <SectorCards />
         <DataVisualization />
       </main>
+      
+      <ProvenanceFooter 
+        provenance={platformProvenance}
+        lastUpdated="2024-01-15"
+        dataQuality="high"
+      />
     </div>
   );
 };
