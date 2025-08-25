@@ -1,15 +1,22 @@
 import React from 'react';
-import { ExternalLink, AlertTriangle, Calendar, Database } from 'lucide-react';
+import { ExternalLink, AlertTriangle, Calendar, Database, CheckCircle, Info } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { DataProvenance } from '@/types';
 import { cn } from '@/lib/utils';
 
+interface DataQuality {
+  freshness: 'current' | 'recent' | 'stale';
+  completeness: number; // 0-100
+  confidence: 'high' | 'medium' | 'low';
+}
+
 interface ProvenanceFooterProps {
   provenance: DataProvenance;
   lastUpdated?: string;
-  dataQuality?: 'high' | 'medium' | 'low';
+  dataQuality?: 'high' | 'medium' | 'low' | DataQuality;
   className?: string;
 }
 
@@ -19,9 +26,13 @@ const ProvenanceFooter: React.FC<ProvenanceFooterProps> = ({
   dataQuality = 'high',
   className
 }) => {
+  // Handle both old string format and new detailed format
+  const isDetailedQuality = typeof dataQuality === 'object';
+  const quality = isDetailedQuality ? (dataQuality as DataQuality) : { confidence: dataQuality as 'high' | 'medium' | 'low' };
+
   const qualityColors = {
     high: 'text-green-600',
-    medium: 'text-yellow-600',
+    medium: 'text-yellow-600', 
     low: 'text-red-600'
   };
 
@@ -29,6 +40,25 @@ const ProvenanceFooter: React.FC<ProvenanceFooterProps> = ({
     high: 'High Quality',
     medium: 'Medium Quality',
     low: 'Low Quality'
+  };
+
+  const getFreshnessColor = (freshness: string) => {
+    switch (freshness) {
+      case 'current':
+        return 'text-green-600 bg-green-50 border-green-200';
+      case 'recent':
+        return 'text-yellow-600 bg-yellow-50 border-yellow-200';
+      case 'stale':
+        return 'text-red-600 bg-red-50 border-red-200';
+      default:
+        return 'text-muted-foreground bg-muted border-border';
+    }
+  };
+
+  const getCompletenessColor = (completeness: number) => {
+    if (completeness >= 90) return 'text-green-600';
+    if (completeness >= 70) return 'text-yellow-600';
+    return 'text-red-600';
   };
 
   const formatDate = (dateString: string) => {
@@ -75,20 +105,82 @@ const ProvenanceFooter: React.FC<ProvenanceFooterProps> = ({
           </div>
         )}
 
-        {/* Data Quality Badge */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Badge
-              variant="outline"
-              className={cn("h-5 text-xs", qualityColors[dataQuality])}
-            >
-              {qualityLabels[dataQuality]}
-            </Badge>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Data quality assessment based on completeness, accuracy, and timeliness</p>
-          </TooltipContent>
-        </Tooltip>
+        {/* Enhanced Data Quality Indicators */}
+        {isDetailedQuality && (dataQuality as DataQuality) ? (
+          <div className="flex items-center gap-2">
+            {/* Freshness */}
+            {(dataQuality as DataQuality).freshness && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Badge
+                    variant="outline"
+                    className={cn("h-5 text-xs flex items-center gap-1", getFreshnessColor((dataQuality as DataQuality).freshness))}
+                  >
+                    {(dataQuality as DataQuality).freshness === 'current' && <CheckCircle className="h-2 w-2" />}
+                    {(dataQuality as DataQuality).freshness === 'recent' && <Calendar className="h-2 w-2" />}
+                    {(dataQuality as DataQuality).freshness === 'stale' && <AlertTriangle className="h-2 w-2" />}
+                    {(dataQuality as DataQuality).freshness}
+                  </Badge>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Data freshness: {(dataQuality as DataQuality).freshness}</p>
+                </TooltipContent>
+              </Tooltip>
+            )}
+
+            {/* Completeness */}
+            {(dataQuality as DataQuality).completeness !== undefined && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Badge
+                    variant="outline"
+                    className={cn("h-5 text-xs flex items-center gap-1", getCompletenessColor((dataQuality as DataQuality).completeness))}
+                  >
+                    <CheckCircle className="h-2 w-2" />
+                    {(dataQuality as DataQuality).completeness}%
+                  </Badge>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <div className="space-y-1">
+                    <p>Data completeness: {(dataQuality as DataQuality).completeness}%</p>
+                    <Progress value={(dataQuality as DataQuality).completeness} className="h-1 w-16" />
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            )}
+
+            {/* Confidence */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Badge
+                  variant="outline"
+                  className={cn("h-5 text-xs flex items-center gap-1", qualityColors[quality.confidence])}
+                >
+                  <Info className="h-2 w-2" />
+                  {qualityLabels[quality.confidence]}
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Statistical confidence: {quality.confidence}</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        ) : (
+          /* Legacy Data Quality Badge */
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Badge
+                variant="outline"
+                className={cn("h-5 text-xs", qualityColors[quality.confidence])}
+              >
+                {qualityLabels[quality.confidence]}
+              </Badge>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Data quality assessment based on completeness, accuracy, and timeliness</p>
+            </TooltipContent>
+          </Tooltip>
+        )}
       </div>
 
       <div className="flex items-center gap-2">

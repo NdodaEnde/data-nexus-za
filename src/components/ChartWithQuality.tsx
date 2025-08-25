@@ -3,6 +3,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { AlertTriangle, Clock } from 'lucide-react';
 import DataQualityBadge from '@/components/DataQualityBadge';
+import DataQualityIndicator from '@/components/DataQualityIndicator';
+import FreshnessWarning from '@/components/FreshnessWarning';
 import ProvenanceFooter from '@/components/ProvenanceFooter';
 import { DataProvenance } from '@/types';
 import { cn } from '@/lib/utils';
@@ -21,6 +23,7 @@ interface ChartWithQualityProps {
   provenance: DataProvenance;
   className?: string;
   showFreshnessWarning?: boolean;
+  showDetailedQuality?: boolean;
 }
 
 const ChartWithQuality: React.FC<ChartWithQualityProps> = ({
@@ -28,7 +31,8 @@ const ChartWithQuality: React.FC<ChartWithQualityProps> = ({
   quality,
   provenance,
   className,
-  showFreshnessWarning = true
+  showFreshnessWarning = true,
+  showDetailedQuality = false
 }) => {
   const getDaysSince = (date: Date) => {
     const now = new Date();
@@ -41,17 +45,17 @@ const ChartWithQuality: React.FC<ChartWithQualityProps> = ({
   const isLowQuality = quality.confidence === 'low';
 
   return (
-    <div className={cn('relative', className)}>
+    <div className={cn('relative space-y-4', className)}>
+      {/* Enhanced Freshness Warning */}
+      {isStale && showFreshnessWarning && (
+        <FreshnessWarning 
+          lastUpdated={quality.lastUpdated}
+          threshold={7}
+        />
+      )}
+
       {/* Quality indicators in top-right corner */}
       <div className="absolute top-2 right-2 z-10 flex items-center gap-2">
-        {/* Freshness warning for stale data */}
-        {isStale && showFreshnessWarning && (
-          <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
-            <Clock className="h-3 w-3 mr-1" />
-            {daysSinceUpdate} days old
-          </Badge>
-        )}
-        
         {/* Data quality badge */}
         <DataQualityBadge
           quality={quality.confidence}
@@ -64,7 +68,7 @@ const ChartWithQuality: React.FC<ChartWithQualityProps> = ({
 
       {/* Low quality data warning */}
       {isLowQuality && (
-        <Alert className="mb-4 border-yellow-200 bg-yellow-50">
+        <Alert className="border-yellow-200 bg-yellow-50">
           <AlertTriangle className="h-4 w-4 text-yellow-600" />
           <AlertDescription className="text-yellow-800">
             <strong>Data Quality Notice:</strong> This data has been flagged as low quality 
@@ -78,11 +82,23 @@ const ChartWithQuality: React.FC<ChartWithQualityProps> = ({
         {children}
       </div>
 
-      {/* Enhanced provenance footer with quality information */}
+      {/* Detailed Quality Indicators (optional) */}
+      {showDetailedQuality && (
+        <DataQualityIndicator 
+          quality={quality}
+          showDetails={true}
+        />
+      )}
+
+      {/* Enhanced provenance footer with detailed quality information */}
       <ProvenanceFooter
         provenance={provenance}
         lastUpdated={quality.lastUpdated.toISOString()}
-        dataQuality={quality.confidence}
+        dataQuality={{
+          freshness: quality.freshness,
+          completeness: quality.completeness,
+          confidence: quality.confidence
+        }}
         className="mt-4"
       />
     </div>

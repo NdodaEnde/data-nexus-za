@@ -1,190 +1,174 @@
 import React from 'react';
-import { AlertTriangle, CheckCircle, Clock, TrendingDown, TrendingUp } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Progress } from '@/components/ui/progress';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { AlertTriangle, CheckCircle, Clock, Database, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+interface DataQuality {
+  freshness: 'current' | 'recent' | 'stale';
+  completeness: number; // 0-100
+  confidence: 'high' | 'medium' | 'low';
+  lastUpdated: Date;
+  source: string;
+}
+
 interface DataQualityIndicatorProps {
-  quality: 'high' | 'medium' | 'low';
-  score?: number; // 0-100
-  lastUpdated: string;
-  frequency: 'monthly' | 'quarterly' | 'annually';
-  trend?: 'improving' | 'declining' | 'stable';
-  issues?: string[];
+  quality: DataQuality;
+  showDetails?: boolean;
   className?: string;
 }
 
 const DataQualityIndicator: React.FC<DataQualityIndicatorProps> = ({
   quality,
-  score,
-  lastUpdated,
-  frequency,
-  trend,
-  issues = [],
+  showDetails = false,
   className
 }) => {
-  const qualityConfig = {
-    high: {
-      color: 'text-green-600 dark:text-green-400',
-      bgColor: 'bg-green-100 dark:bg-green-900/20',
-      borderColor: 'border-green-200 dark:border-green-800',
-      icon: CheckCircle,
-      label: 'High Quality'
-    },
-    medium: {
-      color: 'text-yellow-600 dark:text-yellow-400',
-      bgColor: 'bg-yellow-100 dark:bg-yellow-900/20',
-      borderColor: 'border-yellow-200 dark:border-yellow-800',
-      icon: Clock,
-      label: 'Medium Quality'
-    },
-    low: {
-      color: 'text-red-600 dark:text-red-400',
-      bgColor: 'bg-red-100 dark:bg-red-900/20',
-      borderColor: 'border-red-200 dark:border-red-800',
-      icon: AlertTriangle,
-      label: 'Low Quality'
+  const getFreshnessIcon = (freshness: string) => {
+    switch (freshness) {
+      case 'current':
+        return <CheckCircle className="h-3 w-3 text-green-600" />;
+      case 'recent':
+        return <Clock className="h-3 w-3 text-yellow-600" />;
+      case 'stale':
+        return <AlertTriangle className="h-3 w-3 text-red-600" />;
+      default:
+        return <Info className="h-3 w-3 text-muted-foreground" />;
     }
   };
 
-  const trendConfig = {
-    improving: { icon: TrendingUp, color: 'text-green-600', label: 'Improving' },
-    declining: { icon: TrendingDown, color: 'text-red-600', label: 'Declining' },
-    stable: { icon: Clock, color: 'text-blue-600', label: 'Stable' }
-  };
-
-  const config = qualityConfig[quality];
-  const Icon = config.icon;
-  const TrendIcon = trend ? trendConfig[trend].icon : null;
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffTime = Math.abs(now.getTime() - date.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays < 7) {
-      return `${diffDays} days ago`;
-    } else if (diffDays < 30) {
-      return `${Math.ceil(diffDays / 7)} weeks ago`;
-    } else if (diffDays < 365) {
-      return `${Math.ceil(diffDays / 30)} months ago`;
-    } else {
-      return `${Math.ceil(diffDays / 365)} years ago`;
+  const getFreshnessColor = (freshness: string) => {
+    switch (freshness) {
+      case 'current':
+        return 'text-green-600 bg-green-50 border-green-200';
+      case 'recent':
+        return 'text-yellow-600 bg-yellow-50 border-yellow-200';
+      case 'stale':
+        return 'text-red-600 bg-red-50 border-red-200';
+      default:
+        return 'text-muted-foreground bg-muted border-border';
     }
   };
 
-  const getQualityMessage = () => {
-    if (quality === 'high') {
-      return 'Data is complete, accurate, and up-to-date';
-    } else if (quality === 'medium') {
-      return 'Data has minor gaps or is slightly outdated';
-    } else {
-      return 'Data has significant gaps or quality issues';
+  const getConfidenceColor = (confidence: string) => {
+    switch (confidence) {
+      case 'high':
+        return 'text-green-600';
+      case 'medium':
+        return 'text-yellow-600';
+      case 'low':
+        return 'text-red-600';
+      default:
+        return 'text-muted-foreground';
     }
   };
 
+  const getCompletenessColor = (completeness: number) => {
+    if (completeness >= 90) return 'text-green-600';
+    if (completeness >= 70) return 'text-yellow-600';
+    return 'text-red-600';
+  };
+
+  const daysSinceUpdate = Math.floor(
+    (new Date().getTime() - quality.lastUpdated.getTime()) / (1000 * 60 * 60 * 24)
+  );
+
+  if (!showDetails) {
+    // Compact view - just the quality badge
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Badge
+            variant="outline"
+            className={cn(
+              "h-5 text-xs flex items-center gap-1",
+              getFreshnessColor(quality.freshness),
+              className
+            )}
+          >
+            {getFreshnessIcon(quality.freshness)}
+            {quality.freshness}
+          </Badge>
+        </TooltipTrigger>
+        <TooltipContent>
+          <div className="space-y-1 text-xs">
+            <div>Freshness: {quality.freshness}</div>
+            <div>Completeness: {quality.completeness}%</div>
+            <div>Confidence: {quality.confidence}</div>
+            <div>Updated: {daysSinceUpdate === 0 ? 'Today' : `${daysSinceUpdate} days ago`}</div>
+          </div>
+        </TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  // Detailed view
   return (
-    <div className={cn("space-y-2", className)}>
-      {/* Main Quality Badge */}
+    <div className={cn("space-y-3 p-3 bg-muted/30 rounded-lg border", className)}>
       <div className="flex items-center gap-2">
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div className={cn(
-              "flex items-center gap-2 px-3 py-1.5 rounded-md border",
-              config.bgColor,
-              config.borderColor
-            )}>
-              <Icon className={cn("h-4 w-4", config.color)} />
-              <span className={cn("text-sm font-medium", config.color)}>
-                {config.label}
-              </span>
-              {score !== undefined && (
-                <Badge variant="outline" className="ml-1 h-5 text-xs">
-                  {score}%
-                </Badge>
-              )}
-            </div>
-          </TooltipTrigger>
-          <TooltipContent>
-            <div className="space-y-2 max-w-xs">
-              <p className="font-medium">{getQualityMessage()}</p>
-              {score !== undefined && (
-                <div className="space-y-1">
-                  <div className="flex justify-between text-xs">
-                    <span>Quality Score</span>
-                    <span>{score}%</span>
-                  </div>
-                  <Progress value={score} className="h-1" />
-                </div>
-              )}
-              {issues.length > 0 && (
-                <div className="space-y-1">
-                  <p className="text-xs font-medium">Issues:</p>
-                  <ul className="text-xs space-y-0.5">
-                    {issues.map((issue, index) => (
-                      <li key={index} className="flex items-start gap-1">
-                        <AlertTriangle className="h-3 w-3 text-yellow-500 mt-0.5 flex-shrink-0" />
-                        {issue}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-          </TooltipContent>
-        </Tooltip>
-
-        {/* Trend Indicator */}
-        {trend && TrendIcon && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div className="flex items-center gap-1">
-                <TrendIcon className={cn("h-4 w-4", trendConfig[trend].color)} />
-                <span className={cn("text-xs", trendConfig[trend].color)}>
-                  {trendConfig[trend].label}
-                </span>
-              </div>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Data quality trend over time</p>
-            </TooltipContent>
-          </Tooltip>
-        )}
+        <Database className="h-4 w-4 text-primary" />
+        <span className="text-sm font-medium">Data Quality Metrics</span>
       </div>
 
-      {/* Freshness Indicator */}
-      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-        <Clock className="h-3 w-3" />
-        <span>Updated {formatDate(lastUpdated)}</span>
-        <Badge variant="outline" className="h-4 text-xs">
-          {frequency}
-        </Badge>
-      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Freshness */}
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            {getFreshnessIcon(quality.freshness)}
+            <span className="text-xs font-medium">Freshness</span>
+          </div>
+          <Badge
+            variant="outline"
+            className={cn("text-xs", getFreshnessColor(quality.freshness))}
+          >
+            {quality.freshness}
+          </Badge>
+          <p className="text-xs text-muted-foreground">
+            {daysSinceUpdate === 0 ? 'Updated today' : `${daysSinceUpdate} days old`}
+          </p>
+        </div>
 
-      {/* Issues Alert */}
-      {issues.length > 0 && quality === 'low' && (
-        <div className={cn(
-          "flex items-start gap-2 p-2 rounded-md text-xs",
-          "bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800"
-        )}>
-          <AlertTriangle className="h-3 w-3 text-red-600 mt-0.5 flex-shrink-0" />
+        {/* Completeness */}
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <CheckCircle className={cn("h-3 w-3", getCompletenessColor(quality.completeness))} />
+            <span className="text-xs font-medium">Completeness</span>
+          </div>
           <div className="space-y-1">
-            <p className="font-medium text-red-800 dark:text-red-400">
-              Data Quality Issues
-            </p>
-            <ul className="space-y-0.5 text-red-700 dark:text-red-300">
-              {issues.slice(0, 2).map((issue, index) => (
-                <li key={index}>• {issue}</li>
-              ))}
-              {issues.length > 2 && (
-                <li>• And {issues.length - 2} more issue{issues.length > 3 ? 's' : ''}</li>
-              )}
-            </ul>
+            <div className="flex justify-between items-center">
+              <span className={cn("text-xs font-medium", getCompletenessColor(quality.completeness))}>
+                {quality.completeness}%
+              </span>
+            </div>
+            <Progress value={quality.completeness} className="h-1" />
           </div>
         </div>
-      )}
+
+        {/* Confidence */}
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <Info className={cn("h-3 w-3", getConfidenceColor(quality.confidence))} />
+            <span className="text-xs font-medium">Confidence</span>
+          </div>
+          <Badge
+            variant="outline"
+            className={cn("text-xs", getConfidenceColor(quality.confidence))}
+          >
+            {quality.confidence}
+          </Badge>
+          <p className="text-xs text-muted-foreground">
+            Statistical reliability
+          </p>
+        </div>
+      </div>
+
+      {/* Source */}
+      <div className="pt-2 border-t border-border/30">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <Database className="h-3 w-3" />
+          <span>Source: {quality.source}</span>
+        </div>
+      </div>
     </div>
   );
 };
