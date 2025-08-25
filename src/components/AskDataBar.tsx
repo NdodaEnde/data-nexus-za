@@ -14,24 +14,24 @@ interface QuerySuggestion {
 
 const QUERY_SUGGESTIONS: QuerySuggestion[] = [
   {
-    text: "youth unemployment in KwaZulu-Natal",
-    category: 'trending',
+    text: "Show youth unemployment in South Africa vs South Korea",
+    category: 'template',
     icon: <TrendingUp className="h-3 w-3" />
   },
   {
-    text: "matric pass rates vs South Korea 2027 target",
+    text: "Generate KPI card for youth unemployment",
     category: 'template',
     icon: <Sparkles className="h-3 w-3" />
   },
   {
-    text: "clinic density in rural areas",
-    category: 'recent',
+    text: "Create Gap-Lens chart for youth unemployment",
+    category: 'template',
+    icon: <TrendingUp className="h-3 w-3" />
+  },
+  {
+    text: "Show overall unemployment in South Africa vs China",
+    category: 'trending',
     icon: <Clock className="h-3 w-3" />
-  },
-  {
-    text: "show heatmap of poverty in Western Cape",
-    category: 'template',
-    icon: <Sparkles className="h-3 w-3" />
   }
 ];
 
@@ -39,17 +39,22 @@ interface AskDataBarProps {
   onQuery?: (query: string) => void;
   placeholder?: string;
   className?: string;
+  isProcessing?: boolean;
 }
 
 const AskDataBar: React.FC<AskDataBarProps> = ({
   onQuery,
   placeholder = "Ask anything about South African data...",
-  className
+  className,
+  isProcessing = false
 }) => {
   const [query, setQuery] = useState('');
   const [isActive, setIsActive] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Combined loading state
+  const isDisabled = isLoading || isProcessing;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -95,7 +100,7 @@ const AskDataBar: React.FC<AskDataBarProps> = ({
             onBlur={() => setTimeout(() => setIsActive(false), 200)}
             placeholder={placeholder}
             className="pl-12 pr-24 h-14 text-base bg-background/95 backdrop-blur border-border/50 focus:border-primary/50 focus:bg-background"
-            disabled={isLoading}
+            disabled={isDisabled}
           />
           <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
             <Badge variant="secondary" className="text-xs hidden sm:flex">
@@ -104,10 +109,10 @@ const AskDataBar: React.FC<AskDataBarProps> = ({
             <Button
               type="submit"
               size="sm"
-              disabled={!query.trim() || isLoading}
+              disabled={!query.trim() || isDisabled}
               className="h-10"
             >
-              {isLoading ? (
+              {isDisabled ? (
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent" />
               ) : (
                 <ArrowRight className="h-4 w-4" />

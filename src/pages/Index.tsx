@@ -6,12 +6,24 @@ import DataVisualization from "@/components/DataVisualization";
 import AskDataBar from "@/components/AskDataBar";
 import WardMap from "@/components/WardMap";
 import ProvenanceFooter from "@/components/ProvenanceFooter";
+import QueryResult from "@/components/QueryResult";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, Users, MapPin, Database } from "lucide-react";
+import { useQueryProcessor } from "@/hooks/useQueryProcessor";
 
 const Index = () => {
   const { toast } = useToast();
+  const { 
+    processQuery, 
+    clearQuery, 
+    getSuggestedQueries,
+    isProcessing, 
+    result, 
+    error, 
+    originalQuery,
+    hasResult 
+  } = useQueryProcessor();
 
   // Sample provenance data for the platform
   const platformProvenance = {
@@ -26,19 +38,7 @@ const Index = () => {
   };
 
   const handleQuery = async (query: string) => {
-    // Mock query processing - will be replaced with real LLM integration
-    toast({
-      title: "Processing Query",
-      description: `Analyzing: "${query}"`,
-    });
-    
-    // Simulate processing time
-    setTimeout(() => {
-      toast({
-        title: "Query Complete",
-        description: "Results displayed below",
-      });
-    }, 2000);
+    await processQuery(query);
   };
 
   return (
@@ -65,7 +65,7 @@ const Index = () => {
             
             {/* Ask Data Bar */}
             <div className="max-w-4xl mx-auto">
-              <AskDataBar onQuery={handleQuery} />
+              <AskDataBar onQuery={handleQuery} isProcessing={isProcessing} />
             </div>
 
             {/* Key Stats */}
@@ -104,6 +104,54 @@ const Index = () => {
       </section>
 
       <main className="container mx-auto px-4 py-12 space-y-12">
+        {/* Query Results Section */}
+        {hasResult && result && (
+          <section className="space-y-6">
+            <div className="text-center space-y-2">
+              <h2 className="text-3xl font-bold">Query Results</h2>
+              <p className="text-muted-foreground">
+                AI-powered analysis based on your natural language query
+              </p>
+            </div>
+            <QueryResult 
+              parsedQuery={result} 
+              originalQuery={originalQuery}
+              onNewQuery={clearQuery}
+            />
+          </section>
+        )}
+
+        {/* Error Display */}
+        {error && (
+          <section className="space-y-6">
+            <div className="text-center space-y-2">
+              <h2 className="text-3xl font-bold">Query Suggestions</h2>
+              <p className="text-muted-foreground">
+                Try one of these supported query formats
+              </p>
+            </div>
+            <div className="max-w-4xl mx-auto">
+              <Card className="p-6">
+                <div className="space-y-4">
+                  <div className="text-sm text-destructive whitespace-pre-line">{error}</div>
+                  <div className="space-y-2">
+                    <h4 className="font-semibold">Suggested queries:</h4>
+                    {getSuggestedQueries().map((suggestion, index) => (
+                      <button
+                        key={index}
+                        onClick={() => processQuery(suggestion)}
+                        className="block w-full text-left p-3 text-sm bg-muted/30 hover:bg-muted/50 rounded-lg transition-colors"
+                      >
+                        "{suggestion}"
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </Card>
+            </div>
+          </section>
+        )}
+
         {/* Ward Map Preview */}
         <section className="space-y-6">
           <div className="text-center space-y-2">
