@@ -6,6 +6,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { KPICard } from '@/components/ChartComponents';
 import GapAnalysisChart from '@/components/GapAnalysisChart';
 import GapLensChart from '@/components/GapLensChart';
+import ChartWithQuality from '@/components/ChartWithQuality';
 import { AlertTriangle, Lightbulb, Target, TrendingUp } from 'lucide-react';
 import { ParsedQuery } from '@/services/queryProcessor';
 import { 
@@ -56,30 +57,41 @@ const QueryResult: React.FC<QueryResultProps> = ({
               </span>
             </div>
             
-            <KPICard
-              title={kpiData.indicator}
-              value={`${kpiData.current_value}${kpiData.unit}`}
-              change={kpiData.change}
-              trend={kpiData.trend}
-              icon={<TrendingUp className="h-5 w-5" />}
-              description={kpiData.description}
-            />
-            
-            {kpiData.target && (
-              <Card className="bg-primary/5 border-primary/20">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Target className="h-4 w-4 text-primary" />
-                    <span className="font-medium">Target Analysis</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Current: <strong>{kpiData.current_value}%</strong> | 
-                    Target: <strong>{kpiData.target}%</strong> | 
-                    Gap: <strong>{Math.abs(kpiData.current_value - kpiData.target).toFixed(1)}pp</strong>
-                  </p>
-                </CardContent>
-              </Card>
-            )}
+            <ChartWithQuality
+              quality={{
+                freshness: kpiData.quality.freshness,
+                completeness: kpiData.quality.completeness,
+                confidence: kpiData.quality.confidence,
+                lastUpdated: kpiData.quality.lastUpdated,
+                source: kpiData.quality.source
+              }}
+              provenance={kpiData.provenance}
+            >
+              <KPICard
+                title={kpiData.indicator}
+                value={`${kpiData.current_value}${kpiData.unit}`}
+                change={kpiData.change}
+                trend={kpiData.trend}
+                icon={<TrendingUp className="h-5 w-5" />}
+                description={kpiData.description}
+              />
+              
+              {kpiData.target && (
+                <Card className="bg-primary/5 border-primary/20">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Target className="h-4 w-4 text-primary" />
+                      <span className="font-medium">Target Analysis</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Current: <strong>{kpiData.current_value}%</strong> | 
+                      Target: <strong>{kpiData.target}%</strong> | 
+                      Gap: <strong>{Math.abs(kpiData.current_value - kpiData.target).toFixed(1)}pp</strong>
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+            </ChartWithQuality>
           </div>
         );
 
@@ -115,7 +127,18 @@ const QueryResult: React.FC<QueryResultProps> = ({
               </span>
             </div>
             
-            <GapAnalysisChart data={gapData} />
+            <ChartWithQuality
+              quality={{
+                freshness: gapData.quality.freshness,
+                completeness: gapData.quality.completeness,
+                confidence: gapData.quality.confidence,
+                lastUpdated: gapData.quality.lastUpdated,
+                source: gapData.quality.source
+              }}
+              provenance={gapData.provenance}
+            >
+              <GapAnalysisChart data={gapData} />
+            </ChartWithQuality>
           </div>
         );
 
@@ -146,7 +169,18 @@ const QueryResult: React.FC<QueryResultProps> = ({
               </span>
             </div>
             
-            <GapLensChart data={lensData} />
+            <ChartWithQuality
+              quality={{
+                freshness: lensData.quality.freshness,
+                completeness: lensData.quality.completeness,
+                confidence: lensData.quality.confidence,
+                lastUpdated: lensData.quality.lastUpdated,
+                source: lensData.quality.source
+              }}
+              provenance={lensData.provenance}
+            >
+              <GapLensChart data={lensData} />
+            </ChartWithQuality>
           </div>
         );
 

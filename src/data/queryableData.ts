@@ -1,6 +1,16 @@
 // Sample data to support the 4 query templates
 // In production, this would come from your DuckDB/PostGIS data warehouse
 
+import { DataProvenance } from '@/types';
+
+export interface DataQuality {
+  freshness: 'current' | 'recent' | 'stale';
+  completeness: number; // 0-100
+  confidence: 'high' | 'medium' | 'low';
+  lastUpdated: Date;
+  source: string;
+}
+
 export interface IndicatorData {
   indicator: string;
   current_value: number;
@@ -9,6 +19,8 @@ export interface IndicatorData {
   change: string;
   target?: number;
   description: string;
+  quality: DataQuality;
+  provenance: DataProvenance;
 }
 
 export interface GapAnalysisData {
@@ -23,6 +35,8 @@ export interface GapAnalysisData {
     sa: number;
     peer: number;
   }>;
+  quality: DataQuality;
+  provenance: DataProvenance;
 }
 
 export interface GapLensData {
@@ -37,7 +51,28 @@ export interface GapLensData {
     moderate: string[];
     aggressive: string[];
   };
+  quality: DataQuality;
+  provenance: DataProvenance;
 }
+
+// Common quality and provenance data for reuse
+const getQualityData = (freshness: 'current' | 'recent' | 'stale', confidence: 'high' | 'medium' | 'low', daysOld: number = 30): DataQuality => ({
+  freshness,
+  completeness: confidence === 'high' ? 95 : confidence === 'medium' ? 85 : 70,
+  confidence,
+  lastUpdated: new Date(Date.now() - daysOld * 24 * 60 * 60 * 1000),
+  source: 'Stats SA'
+});
+
+const getStatsProvenance = (datasetName: string): DataProvenance => ({
+  source_organization: 'Statistics South Africa',
+  dataset_name: datasetName,
+  collection_date: '2024-10-15',
+  publication_date: '2024-10-20',
+  methodology_url: 'https://www.statssa.gov.za/methodology',
+  license: 'Open Data',
+  citation: `Statistics South Africa. ${datasetName}. 2024.`
+});
 
 // KPI card data for indicators
 export const indicatorKPIs: Record<string, IndicatorData> = {
@@ -48,7 +83,9 @@ export const indicatorKPIs: Record<string, IndicatorData> = {
     trend: 'up',
     change: '+2.1% vs last quarter',
     target: 15.0,
-    description: 'Percentage of youth (15-24) who are unemployed and actively seeking work'
+    description: 'Percentage of youth (15-24) who are unemployed and actively seeking work',
+    quality: getQualityData('recent', 'high', 45),
+    provenance: getStatsProvenance('Quarterly Labour Force Survey Q3 2024')
   },
   'overall unemployment': {
     indicator: 'Overall Unemployment Rate',
@@ -57,7 +94,9 @@ export const indicatorKPIs: Record<string, IndicatorData> = {
     trend: 'up',
     change: '+1.2% vs last year',
     target: 10.0,
-    description: 'Percentage of economically active population that is unemployed'
+    description: 'Percentage of economically active population that is unemployed',
+    quality: getQualityData('recent', 'high', 45),
+    provenance: getStatsProvenance('Quarterly Labour Force Survey Q3 2024')
   },
   'literacy rate': {
     indicator: 'Adult Literacy Rate',
@@ -66,7 +105,9 @@ export const indicatorKPIs: Record<string, IndicatorData> = {
     trend: 'up',
     change: '+0.8% vs last year',
     target: 95.0,
-    description: 'Percentage of population aged 20+ that can read and write'
+    description: 'Percentage of population aged 20+ that can read and write',
+    quality: getQualityData('stale', 'medium', 180),
+    provenance: getStatsProvenance('Community Survey 2023')
   },
   'matric pass rate': {
     indicator: 'Matric Pass Rate',
@@ -75,7 +116,9 @@ export const indicatorKPIs: Record<string, IndicatorData> = {
     trend: 'down',
     change: '-1.5% vs last year',
     target: 90.0,
-    description: 'Percentage of Grade 12 learners who passed matric exams'
+    description: 'Percentage of Grade 12 learners who passed matric exams',
+    quality: getQualityData('current', 'high', 15),
+    provenance: getStatsProvenance('National Senior Certificate Results 2024')
   }
 };
 
@@ -96,7 +139,9 @@ export const gapAnalysisData: Record<string, GapAnalysisData[]> = {
         { year: 2021, sa: 66.5, peer: 7.8 },
         { year: 2022, sa: 60.7, peer: 7.2 },
         { year: 2023, sa: 61.0, peer: 7.0 }
-      ]
+      ],
+      quality: getQualityData('recent', 'high', 45),
+      provenance: getStatsProvenance('Youth Unemployment Comparative Analysis 2024')
     },
     {
       indicator: 'Youth Unemployment',
@@ -112,7 +157,9 @@ export const gapAnalysisData: Record<string, GapAnalysisData[]> = {
         { year: 2021, sa: 66.5, peer: 11.1 },
         { year: 2022, sa: 60.7, peer: 10.5 },
         { year: 2023, sa: 61.0, peer: 10.0 }
-      ]
+      ],
+      quality: getQualityData('recent', 'medium', 60),
+      provenance: getStatsProvenance('Youth Unemployment Comparative Analysis 2024')
     }
   ],
   'overall unemployment': [
@@ -130,7 +177,9 @@ export const gapAnalysisData: Record<string, GapAnalysisData[]> = {
         { year: 2021, sa: 30.8, peer: 3.6 },
         { year: 2022, sa: 32.1, peer: 3.3 },
         { year: 2023, sa: 32.9, peer: 3.1 }
-      ]
+      ],
+      quality: getQualityData('recent', 'high', 45),
+      provenance: getStatsProvenance('Unemployment Comparative Analysis 2024')
     }
   ]
 };
@@ -162,7 +211,9 @@ export const gapLensData: Record<string, GapLensData> = {
         'Export-oriented job creation',
         'Education system overhaul'
       ]
-    }
+    },
+    quality: getQualityData('current', 'medium', 30),
+    provenance: getStatsProvenance('Youth Employment Scenario Modeling 2024')
   },
   'overall unemployment': {
     indicator: 'Overall Unemployment',
@@ -189,7 +240,9 @@ export const gapLensData: Record<string, GapLensData> = {
         'Innovation economy development',
         'Infrastructure investment surge'
       ]
-    }
+    },
+    quality: getQualityData('current', 'medium', 30),
+    provenance: getStatsProvenance('Employment Scenario Modeling 2024')
   }
 };
 
