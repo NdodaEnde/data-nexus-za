@@ -5,24 +5,12 @@ import SectorCards from "@/components/SectorCards";
 import DataVisualization from "@/components/DataVisualization";
 import AskDataBar from "@/components/AskDataBar";
 import WardMap from "@/components/WardMap";
-import ProvenanceFooter from "@/components/ProvenanceFooter";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, Users, MapPin, Database } from "lucide-react";
-import { DataProvenance } from "@/types";
 
 const Index = () => {
   const { toast } = useToast();
-
-  const sampleProvenance: DataProvenance = {
-    source_organization: "Statistics South Africa (Stats SA)",
-    dataset_name: "Community Survey 2022",
-    collection_date: "2022-01-01",
-    publication_date: "2022-12-15",
-    methodology_url: "https://www.statssa.gov.za/publications/Report-03-01-06/Report-03-01-062022.pdf",
-    license: "CC BY 4.0",
-    citation: "Statistics South Africa. Community Survey 2022. Pretoria: Stats SA, 2022."
-  };
 
   const handleQuery = async (query: string) => {
     // Mock query processing - will be replaced with real LLM integration
@@ -116,13 +104,6 @@ const Index = () => {
 
         <SectorCards />
         <DataVisualization />
-        
-        {/* Data Provenance */}
-        <ProvenanceFooter 
-          provenance={sampleProvenance}
-          lastUpdated="2024-01-15"
-          dataQuality="high"
-        />
       </main>
     </div>
   );
