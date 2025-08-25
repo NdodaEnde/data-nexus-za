@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 import { LineChart, Line, BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { useState } from "react";
+import ProvenanceFooter from "@/components/ProvenanceFooter";
+import { DataProvenance } from "@/types";
 
 // Mock data for labour insights
 const currentStats = {
@@ -104,6 +106,16 @@ const pathways = [
 
 const Labour = () => {
   const [selectedScenario, setSelectedScenario] = useState("moderate");
+
+  const labourProvenance: DataProvenance = {
+    source_organization: "Statistics South Africa (Stats SA)",
+    dataset_name: "Quarterly Labour Force Survey Q3 2024",
+    collection_date: "2024-07-01",
+    publication_date: "2024-11-30",
+    methodology_url: "https://www.statssa.gov.za/publications/P0211/P02113rdQuarter2024.pdf",
+    license: "CC BY 4.0",
+    citation: "Statistics South Africa. Quarterly Labour Force Survey, Q3 2024. Pretoria: Stats SA, 2024."
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -473,6 +485,13 @@ const Labour = () => {
             </CardContent>
           </Card>
         </section>
+        
+        {/* Data Provenance */}
+        <ProvenanceFooter 
+          provenance={labourProvenance}
+          lastUpdated="2024-11-30"
+          dataQuality="high"
+        />
       </div>
     </div>
   );
