@@ -4,7 +4,7 @@ import HeroSection from "@/components/HeroSection";
 import SectorCards from "@/components/SectorCards";
 import DataVisualization from "@/components/DataVisualization";
 import AskDataBar from "@/components/AskDataBar";
-import WardMap from "@/components/WardMap";
+import MapboxWardMap from "@/components/MapboxWardMap";
 import ProvenanceFooter from "@/components/ProvenanceFooter";
 import QueryResult from "@/components/QueryResult";
 import { Card } from "@/components/ui/card";
@@ -160,7 +160,7 @@ const Index = () => {
               Click on any ward to explore local indicators and compare with national averages
             </p>
           </div>
-          <WardMap height="600px" />
+          <MapboxWardMap height="600px" />
         </section>
 
         <SectorCards />
